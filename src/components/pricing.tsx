@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { loadStripe, StripeElementsOptions, PaymentRequestOptions } from "@stripe/stripe-js"
+import { loadStripe, StripeElementsOptions, type StripePaymentRequest } from "@stripe/stripe-js"
 import { Elements, PaymentElement, useElements, useStripe, PaymentRequestButtonElement } from "@stripe/react-stripe-js"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
@@ -181,21 +181,28 @@ function CheckoutContents({ planName, onClose }: { planName: string; onClose: ()
   const stripe = useStripe()
   const elements = useElements()
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
+  const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null)
   const [processing, setProcessing] = useState(false)
 
   useEffect(() => {
     async function setupPRB() {
       if (!stripe) return
-      const pr: PaymentRequestOptions = {
+      const prInit = {
         country: "US",
         currency: "usd",
         total: { label: planName || "Daily Prayer", amount: 0 }, // Stripe will use PI amount
         requestPayerName: true,
         requestPayerEmail: true,
       }
-      const paymentRequest = stripe.paymentRequest(pr)
-      const result = await paymentRequest.canMakePayment()
-      if (result) setPaymentRequestAvailable(true)
+      const pr = stripe.paymentRequest(prInit)
+      const result = await pr.canMakePayment()
+      if (result) {
+        setPaymentRequest(pr)
+        setPaymentRequestAvailable(true)
+      } else {
+        setPaymentRequest(null)
+        setPaymentRequestAvailable(false)
+      }
     }
     setupPRB()
   }, [stripe, planName])
@@ -220,9 +227,9 @@ function CheckoutContents({ planName, onClose }: { planName: string; onClose: ()
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
-      {paymentRequestAvailable && (
+      {paymentRequestAvailable && paymentRequest && (
         <div className="rounded-xl border p-3">
-          <PaymentRequestButtonElement options={{ layout: "auto" }} />
+          <PaymentRequestButtonElement options={{ paymentRequest }} />
           <div className="mt-2 text-xs text-neutral-600">Or pay with card</div>
         </div>
       )}
