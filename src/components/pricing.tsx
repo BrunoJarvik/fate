@@ -1,9 +1,13 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { loadStripe, StripeElementsOptions, PaymentRequestOptions } from "@stripe/stripe-js"
+import { Elements, PaymentElement, useElements, useStripe, PaymentRequestButtonElement } from "@stripe/react-stripe-js"
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
 
 type Plan = {
   name: string
@@ -14,6 +18,7 @@ type Plan = {
   gifts?: string[]
   popular?: boolean
   valueNote?: string
+  planKey: "oneMonth" | "threeMonths" | "twelveMonths"
 }
 const plans: Plan[] = [
   {
@@ -24,6 +29,7 @@ const plans: Plan[] = [
       "Daily prayers, reminders, journaling, intentions wall",
       "Cancel anytime",
     ],
+    planKey: "oneMonth",
   },
   {
     name: "3 months of prayer sessions",
@@ -41,6 +47,7 @@ const plans: Plan[] = [
     ],
     popular: true,
     valueNote: "Save 22% + Gifts",
+    planKey: "threeMonths",
   },
   {
     name: "12 months of prayer sessions",
@@ -57,19 +64,43 @@ const plans: Plan[] = [
       "Seasonal Scripture Cards (digital): printable set each quarter",
     ],
     valueNote: "Save 44% + All Gifts",
+    planKey: "twelveMonths",
   },
 ]
 
 export function Pricing() {
   const [open, setOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
 
   function handleSelect(p: Plan) {
     setSelectedPlan(p)
     setOpen(true)
-    // Analytics stub
     console.log("start_checkout", { plan: p.name })
   }
+
+  useEffect(() => {
+    async function createIntent() {
+      if (!open || !selectedPlan) return
+      try {
+        const res = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: selectedPlan.planKey }),
+        })
+        const data = await res.json()
+        if (data?.clientSecret) setClientSecret(data.clientSecret)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    createIntent()
+  }, [open, selectedPlan])
+
+  const options: StripeElementsOptions | undefined = useMemo(() => {
+    if (!clientSecret) return undefined
+    return { clientSecret, appearance: { theme: "stripe" } }
+  }, [clientSecret])
 
   return (
     <section id="pricing" className="border-y border-border/60 bg-muted">
@@ -107,10 +138,7 @@ export function Pricing() {
                     </ul>
                   </div>
                 )}
-                <Button
-                  onClick={() => handleSelect(p)}
-                  className="mt-6 h-11 w-full rounded-2xl font-bold text-white"
-                >
+                <Button onClick={() => handleSelect(p)} className="mt-6 h-11 w-full rounded-2xl font-bold text-white">
                   {p.popular
                     ? "Get 3 Months + Gifts"
                     : p.name.includes("12 months")
@@ -130,45 +158,80 @@ export function Pricing() {
         </p>
       </div>
 
-      {/* Mock Checkout Dialog (replace with Stripe later) */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="rounded-2xl">
           <DialogHeader>
-            <DialogTitle>Checkout (Mock)</DialogTitle>
+            <DialogTitle>Checkout</DialogTitle>
             <DialogDescription>
-              This is a placeholder for Stripe (cards) and Apple Pay / Google Pay. See TODOs in code.
+              Pay securely. Apple Pay / Google Pay appears when available.
             </DialogDescription>
           </DialogHeader>
-          <div className="rounded-xl border p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-neutral-600">Selected plan</div>
-                <div className="text-lg font-semibold">{selectedPlan?.name}</div>
-              </div>
-              <div className="text-lg font-semibold">{selectedPlan?.price}</div>
-            </div>
-            <div className="mt-4 grid gap-3">
-              <input className="h-11 rounded-xl border px-3 text-sm" placeholder="Email" aria-label="Email" />
-              <input className="h-11 rounded-xl border px-3 text-sm" placeholder="Name" aria-label="Name" />
-            </div>
-            <Button
-              className="mt-4 h-11 w-full rounded-2xl font-bold text-white"
-              onClick={() => {
-                console.log("purchase_mock", { plan: selectedPlan?.name })
-                alert("Mock purchase complete! (Integrate Stripe here.)")
-                setOpen(false)
-              }}
-            >
-              Complete Purchase (Mock)
-            </Button>
-            <p className="mt-2 text-xs text-neutral-600">You won’t be charged in this mock flow.</p>
-          </div>
-          <div className="mt-2 text-xs text-neutral-600">
-            TODO: Replace this dialog with Stripe Payment Element and Payment Request Button (Apple Pay/Google Pay).
-          </div>
+          {clientSecret && options && (
+            <Elements stripe={stripePromise!} options={options}>
+              <CheckoutContents planName={selectedPlan?.name || ""} onClose={() => setOpen(false)} />
+            </Elements>
+          )}
         </DialogContent>
       </Dialog>
     </section>
+  )
+}
+
+function CheckoutContents({ planName, onClose }: { planName: string; onClose: () => void }) {
+  const stripe = useStripe()
+  const elements = useElements()
+  const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
+  const [processing, setProcessing] = useState(false)
+
+  useEffect(() => {
+    async function setupPRB() {
+      if (!stripe) return
+      const pr: PaymentRequestOptions = {
+        country: "US",
+        currency: "usd",
+        total: { label: planName || "Daily Prayer", amount: 0 }, // Stripe will use PI amount
+        requestPayerName: true,
+        requestPayerEmail: true,
+      }
+      const paymentRequest = stripe.paymentRequest(pr)
+      const result = await paymentRequest.canMakePayment()
+      if (result) setPaymentRequestAvailable(true)
+    }
+    setupPRB()
+  }, [stripe, planName])
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!stripe || !elements) return
+    setProcessing(true)
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: { return_url: window.location.href },
+      redirect: "if_required",
+    })
+    setProcessing(false)
+    if (error) {
+      alert(error.message)
+    } else {
+      console.log("purchase", { plan: planName })
+      onClose()
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      {paymentRequestAvailable && (
+        <div className="rounded-xl border p-3">
+          <PaymentRequestButtonElement options={{ layout: "auto" }} />
+          <div className="mt-2 text-xs text-neutral-600">Or pay with card</div>
+        </div>
+      )}
+      <PaymentElement options={{ layout: "tabs" }} />
+      <Button type="submit" disabled={!stripe || processing} className="h-11 w-full rounded-2xl font-bold text-white">
+        {processing ? "Processing…" : "Complete Purchase"}
+      </Button>
+      <div className="text-xs text-neutral-600">You’ll receive an email receipt.</div>
+    </form>
   )
 }
 
