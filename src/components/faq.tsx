@@ -2,6 +2,14 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 const faqs = [
   {
+    q: "How does the free trial work?",
+    a: "You won’t be charged for 1 day. After that, it’s $7/week unless you cancel.",
+  },
+  {
+    q: "Why does it say $0.99/day?",
+    a: "It helps visualize the daily value. Billing is weekly: $7 after your 1‑day free trial.",
+  },
+  {
     q: "Is this for my denomination?",
     a: "Yes. The app focuses on scripture, short guided prayers, and gratitude. No debates—just a simple way back to daily prayer.",
   },

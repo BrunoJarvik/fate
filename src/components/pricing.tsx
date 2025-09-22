@@ -22,48 +22,41 @@ type Plan = {
 }
 const plans: Plan[] = [
   {
-    name: "1 month of prayer sessions",
-    price: "$14.99",
+    name: "Daily Prayer Access",
+    price: "$0.99/day",
     cycle: "",
     features: [
-      "Daily prayers, reminders, journaling, intentions wall",
+      "1-day free trial",
+      "Guided prayers, reminders, journaling",
       "Cancel anytime",
     ],
+    badge: "Start Free",
+    popular: true,
+    valueNote: "Billed weekly at $7 after 1-day free",
     planKey: "oneMonth",
   },
   {
-    name: "3 months of prayer sessions",
-    price: "$34.99",
+    name: "Daily Prayer Access",
+    price: "$0.99/day",
     cycle: "",
     features: [
-      "Everything in 1 month",
-      "Save 22% vs paying monthly",
+      "1-day free trial",
+      "Guided prayers, reminders, journaling",
+      "Cancel anytime",
     ],
-    badge: "Most Popular",
-    gifts: [
-      "Guided Audio Pack: Morning & Evening reset (downloadable)",
-      "Printable Prayer Journal (PDF): 30 days of prompts",
-      "90-Day Reconnection Challenge: email coaching & milestone badges",
-    ],
-    popular: true,
-    valueNote: "Save 22% + Gifts",
+    valueNote: "Billed weekly at $7 after 1-day free",
     planKey: "threeMonths",
   },
   {
-    name: "12 months of prayer sessions",
-    price: "$99.99",
+    name: "Daily Prayer Access",
+    price: "$0.99/day",
     cycle: "",
     features: [
-      "Everything in 1 month",
-      "Save 44% vs paying monthly",
+      "1-day free trial",
+      "Guided prayers, reminders, journaling",
+      "Cancel anytime",
     ],
-    badge: "Best Value",
-    gifts: [
-      "All 3-Month Gifts",
-      "Quarterly Live Retreat (virtual): exclusive members’ session",
-      "Seasonal Scripture Cards (digital): printable set each quarter",
-    ],
-    valueNote: "Save 44% + All Gifts",
+    valueNote: "Billed weekly at $7 after 1-day free",
     planKey: "twelveMonths",
   },
 ]
@@ -122,11 +115,10 @@ export function Pricing() {
                     </span>
                   )}
                 </div>
-                <div className="mt-4 flex items-end gap-2">
-                  <span className="text-3xl font-bold">{p.price}</span>
-                  {p.cycle && <span className="text-neutral-600">{p.cycle}</span>}
+                <div className="mt-4 flex flex-col">
+                  <div className="text-3xl font-bold">{p.price} <span className="text-lg font-normal">/day</span></div>
+                  {p.valueNote && <div className="mt-1 text-sm text-primary">{p.valueNote}</div>}
                 </div>
-                {p.valueNote && <div className="mt-1 text-sm text-primary">{p.valueNote}</div>}
                 <ul className="mt-4 space-y-2 text-sm">
                   {p.features.map((f, idx) => <li key={idx}>• {f}</li>)}
                 </ul>
@@ -139,15 +131,9 @@ export function Pricing() {
                   </div>
                 )}
                 <Button onClick={() => handleSelect(p)} className="mt-6 h-11 w-full rounded-2xl font-bold text-white">
-                  {p.popular
-                    ? "Get 3 Months + Gifts"
-                    : p.name.includes("12 months")
-                      ? "Go Annual + All Gifts"
-                      : "Start 1 Month"}
+                  Start 1-Day Free Trial
                 </Button>
-                <p className="mt-3 text-xs text-neutral-600">
-                  Gifts delivered instantly via email after checkout.
-                </p>
+                <p className="mt-3 text-xs text-neutral-600">Then $7/week. Cancel anytime.</p>
               </CardContent>
             </Card>
           ))}

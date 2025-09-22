@@ -1,22 +1,29 @@
 import { Card, CardContent } from "@/components/ui/card"
 
+const femaleNames = [
+  "Grace M.", "Sophia L.", "Chloe R.", "Isabella T.", "Ava K.",
+  "Mia N.", "Harper J.", "Evelyn P.", "Camila S.", "Abigail W.",
+  "Ella D.", "Madison F.", "Scarlett B.", "Victoria H.", "Luna C.",
+  "Nora V.", "Zoe A.", "Lily G.", "Hannah Y.", "Emily Q."
+]
+
 const items = [
   {
     quote: "I felt numb for months. Now I look forward to 5 quiet minutes with God every morning.",
     sub: "“It’s like the app takes my hand when I don’t have words.”",
-    name: "Maria G.",
+    name: femaleNames[0],
     proof: "Completed 27 sessions in 30 days",
   },
   {
     quote: "I was drowning in negativity. These short prayers reset my day.",
     sub: "“I start calm instead of anxious. My family feels it too.”",
-    name: "James A.",
+    name: femaleNames[1],
     proof: "Joined the Sunday live prayer 3×",
   },
   {
     quote: "I wanted to pray daily but never stuck with it. The gentle reminders + streak changed everything.",
     sub: "“Small steps, big change.”",
-    name: "Leila K.",
+    name: femaleNames[2],
     proof: "Wrote 18 gratitude notes",
   },
 ]
