@@ -7,7 +7,7 @@ if (!stripeSecret) {
   console.warn("STRIPE_SECRET_KEY is not set. The create-payment-intent route will return 500.")
 }
 
-const stripe = stripeSecret ? new Stripe(stripeSecret, { apiVersion: "2024-06-20" }) : (null as unknown as Stripe)
+const stripe = stripeSecret ? new Stripe(stripeSecret) : (null as unknown as Stripe)
 
 // Small plan → amount (in cents) mapping. Keep amounts on the server.
 const PLAN_TO_AMOUNT: Record<string, number> = {
