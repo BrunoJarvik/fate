@@ -84,30 +84,7 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Right column (app mock) */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.05 }}
-          className="relative mx-auto w-full max-w-xs sm:max-w-sm md:max-w-sm"
-          aria-label="App preview"
-        >
-          <div className="rounded-2xl bg-white p-4 shadow-soft sm:p-5">
-            <div className="rounded-xl border border-border p-3 sm:p-4">
-              <div className="text-xs text-neutral-600 sm:text-sm">Today’s Prayer • 5:00</div>
-              <div className="mt-2 h-2 w-full rounded-full bg-muted">
-                <div className="h-2 w-1/2 rounded-full bg-primary" />
-              </div>
-              <div className="mt-4">
-                <button className="w-full rounded-xl border border-border bg-white p-3 text-left text-sm hover:bg-muted">Add intention</button>
-              </div>
-              <div className="mt-2">
-                <button className="w-full rounded-xl border border-border bg-white p-3 text-left text-sm hover:bg-muted">Gratitude note</button>
-              </div>
-              <div className="mt-3 text-right text-xs text-neutral-600 sm:text-sm">Streak: 11 days 🔥</div>
-            </div>
-          </div>
-        </motion.div>
+        {/* Right column removed per request */}
       </div>
     </section>
   )

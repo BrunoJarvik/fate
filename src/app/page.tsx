@@ -16,11 +16,11 @@ export default function Page() {
       <ClientEvents />
       <Navbar />
       <Hero />
-      <Testimonials />
       <HowItWorks />
+      <Pricing />
+      <Testimonials />
       <Benefits />
       <Guarantee />
-      <Pricing />
       <Credibility />
       <FAQ />
       <Footer />
