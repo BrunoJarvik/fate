@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { loadStripe, StripeElementsOptions, type StripePaymentRequest } from "@stripe/stripe-js"
+import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js"
 import { Elements, PaymentElement, useElements, useStripe, PaymentRequestButtonElement } from "@stripe/react-stripe-js"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
@@ -181,7 +181,7 @@ function CheckoutContents({ planName, onClose }: { planName: string; onClose: ()
   const stripe = useStripe()
   const elements = useElements()
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
-  const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null)
+  const [paymentRequest, setPaymentRequest] = useState<any | null>(null)
   const [processing, setProcessing] = useState(false)
 
   useEffect(() => {
