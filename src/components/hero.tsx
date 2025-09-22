@@ -2,6 +2,12 @@
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 
+// UGC videos displayed in the Hero scroller. Add more entries as you drop
+// files into /public/ugc. Posters are optional but recommended.
+const UGC_VIDEOS = [
+  { src: "/ugc/video-1.mp4", poster: "/ugc/video-1.jpg", label: "Member morning routine" },
+] as const
+
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-border/60 bg-muted">
@@ -46,18 +52,32 @@ export function Hero() {
           </div>
 
           {/* UGC scroller — no overflow, proper snap and padding so cards aren't clipped */}
-          <div className="mt-5 -mx-4 overflow-x-auto px-4 no-scrollbar touch-pan-x snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none]">
+          <div className="mt-5 -mx-4 overflow-x-auto px-4 snap-x snap-mandatory no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] touch-pan-x">
             <div className="flex gap-3 sm:gap-4 pr-4" role="list" aria-label="Member videos using the app">
-              {[1,2,3,4,5].map((i) => (
+              {UGC_VIDEOS.map((v, i) => (
                 <div
                   key={i}
                   role="listitem"
                   className="snap-center rounded-2xl border border-border bg-white p-2 shadow-soft min-w-[72%] max-w-[72%] sm:min-w-[200px] sm:max-w-[200px]"
+                  aria-label={v.label || `UGC clip ${i + 1}`}
                 >
                   <div className="aspect-[9/16] overflow-hidden rounded-xl bg-black/5">
-                    <video className="h-full w-full object-cover" muted loop playsInline />
+                    <video
+                      className="h-full w-full object-cover"
+                      muted
+                      playsInline
+                      preload="metadata"
+                      controls
+                      controlsList="nodownload noremoteplayback"
+                      disablePictureInPicture
+                      poster={v.poster}
+                    >
+                      <source src={v.src} type="video/mp4" />
+                    </video>
                   </div>
-                  <div className="mt-2 text-xs text-neutral-600">UGC clip #{i} — add later</div>
+                  <div className="mt-2 text-xs text-neutral-600 line-clamp-1">
+                    {v.label || `UGC clip #${i + 1}`}
+                  </div>
                 </div>
               ))}
             </div>
