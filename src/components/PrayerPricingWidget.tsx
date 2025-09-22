@@ -72,7 +72,7 @@ export function PrayerPricingWidget({
   testimonials = defaultTestimonials,
   trialMode = "free-trial",
   onCheckout,
-  onToggleTrialMode,
+  onToggleTrialMode: _onToggleTrialMode,
   defaultPlan = "annual",
   showCoupon = true,
   enableApplePay = true,
@@ -305,7 +305,7 @@ export function PrayerPricingWidget({
           {getTrustText()}
         </p>
         <p style={{ margin: 0, fontSize: "0.875rem", opacity: 0.7 }}>
-          Secure checkout • Encrypted payment • You're in control
+          Secure checkout • Encrypted payment • You&apos;re in control
         </p>
       </section>
 
@@ -488,7 +488,7 @@ export function PrayerPricingWidget({
                   fontSize: "0.875rem",
                   fontStyle: "italic"
                 }}>
-                  "{testimonial.quote}"
+                  &ldquo;{testimonial.quote}&rdquo;
                 </p>
                 <cite style={{ fontSize: "0.75rem", opacity: 0.7 }}>
                   — {testimonial.author}
