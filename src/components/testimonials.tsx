@@ -37,6 +37,15 @@ export function Testimonials() {
         {items.map((t, i) => (
           <Card key={i} className="rounded-2xl">
             <CardContent className="p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <img
+                  src={["/reviews/avatars/21e3b0991350a1a20ee9bc2b9e927abc.jpg","/reviews/avatars/4bb0a994c951e77a175645e8d4df6cca.jpg","/reviews/avatars/827c92203f6c7198ea50489f9ae9ccbd.jpg"][i % 3]}
+                  alt={`${t.name} avatar`}
+                  loading="lazy"
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+                <div className="font-semibold">{t.name}</div>
+              </div>
               <p className="text-lg font-medium">“{t.quote}”</p>
               <p className="mt-3 text-neutral-700">{t.sub}</p>
               <div className="mt-5 flex items-center justify-between text-sm text-neutral-600">
