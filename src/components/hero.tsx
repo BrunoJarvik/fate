@@ -1,6 +1,7 @@
 "use client"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
+import ClickToPlayVideo from "./ClickToPlayVideo"
 
 // UGC videos displayed in the Hero scroller. Add more entries as you drop
 // files into /public/ugc. Posters are optional but recommended.
@@ -29,14 +30,26 @@ export function Hero() {
 
           {/* Primary CTA */}
           <div className="mt-5">
-            <a href="#pricing" className="block">
-              <Button
-                className="h-12 w-full rounded-2xl px-6 font-bold text-white"
-                aria-label="Start My Daily Prayer"
-              >
-                Start My Daily Prayer
-              </Button>
-            </a>
+            <Button
+              className="h-12 w-full rounded-2xl px-6 font-bold text-white"
+              aria-label="Start 7-day free trial"
+              onClick={async () => {
+                try {
+                  const res = await fetch("/api/create-checkout-session", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                  })
+                  const data = await res.json()
+                  if (data?.url) {
+                    window.location.href = data.url
+                  }
+                } catch (error) {
+                  console.error("Checkout error:", error)
+                }
+              }}
+            >
+              Start 7-day free trial
+            </Button>
             <a href="#pricing" className="mt-2 block text-center text-sm underline underline-offset-4">
               See Plans &amp; Bonuses
             </a>
@@ -62,18 +75,11 @@ export function Hero() {
                   aria-label={v.label || `UGC clip ${i + 1}`}
                 >
                   <div className="aspect-[9/16] overflow-hidden rounded-xl bg-black/5">
-                    <video
-                      className="h-full w-full object-cover"
-                      muted
-                      playsInline
-                      preload="metadata"
-                      controls
-                      controlsList="nodownload noremoteplayback"
-                      disablePictureInPicture
+                    <ClickToPlayVideo
+                      src={v.src}
                       poster={v.poster}
-                    >
-                      <source src={v.src} type="video/mp4" />
-                    </video>
+                      className="h-full w-full"
+                    />
                   </div>
                   <div className="mt-2 text-xs text-neutral-600 line-clamp-1">
                     {v.label || `UGC clip #${i + 1}`}
